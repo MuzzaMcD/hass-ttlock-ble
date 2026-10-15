@@ -5,20 +5,20 @@ from __future__ import annotations
 import datetime as dt
 from typing import TYPE_CHECKING, cast
 
+import voluptuous as vol
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import SupportsResponse
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.device_registry import (
     async_get as async_get_device_registry,
+)
+from homeassistant.helpers.device_registry import (
     format_mac,
 )
 from homeassistant.helpers.entity_registry import (
     async_get as async_get_entity_registry,
 )
-import voluptuous as vol
-
-from ttlock_ble import TTLockError
 
 from .const import (
     DOMAIN,
@@ -35,6 +35,7 @@ from .const import (
     SERVICE_SET_PASSAGE_MODE,
 )
 from .passage import PASSAGE_TYPE_WEEKLY
+from .ttlock_ble import TTLockError
 
 if TYPE_CHECKING:
     from collections.abc import Mapping

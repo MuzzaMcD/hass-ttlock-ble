@@ -8,7 +8,6 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from bleak import BleakError
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from ttlock_ble import DeviceInfo, LockEvent, TTLockError
 
 from custom_components.hass_ttlock_ble.connection import (
     TtlockBleConnection,
@@ -17,6 +16,11 @@ from custom_components.hass_ttlock_ble.connection import (
     log_signal,
 )
 from custom_components.hass_ttlock_ble.data import TtlockBleLogCursor
+from custom_components.hass_ttlock_ble.ttlock_ble import (
+    DeviceInfo,
+    LockEvent,
+    TTLockError,
+)
 
 
 def _log_entry(record_number: int) -> SimpleNamespace:

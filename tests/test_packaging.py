@@ -1,38 +1,46 @@
-"""The manifest pin and the tested pin must name the same SDK release."""
+"""The ttlock-ble SDK ships bundled inside the integration, not from PyPI."""
 
 from __future__ import annotations
 
 import json
-import tomllib
+import re
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
-_SDK = "ttlock-ble"
+_COMPONENT = _ROOT / "custom_components" / "hass_ttlock_ble"
+_BUNDLED = _COMPONENT / "ttlock_ble"
 
 
-def _pinned(requirements: list[str], package: str) -> str | None:
-    """Return the version `package` is pinned to within `requirements`."""
-    for requirement in requirements:
-        name, separator, version = requirement.partition("==")
-        if separator and name.strip() == package:
-            return version.strip()
-    return None
+def test_manifest_does_not_install_the_sdk() -> None:
+    """Home Assistant must not install ttlock-ble from PyPI.
 
-
-def test_manifest_and_dev_group_pin_the_same_sdk_version() -> None:
-    """Home Assistant installs the manifest pin; the suite runs the dev-group one.
-
-    When they drift, every test passes against a release the running
-    integration never sees.
+    The integration imports its bundled copy, so a manifest requirement on the
+    package would only install an unused (and possibly different) release.
     """
-    manifest = json.loads(
-        (_ROOT / "custom_components" / "hass_ttlock_ble" / "manifest.json").read_text(),
-    )
-    pyproject = tomllib.loads((_ROOT / "pyproject.toml").read_text())
+    manifest = json.loads((_COMPONENT / "manifest.json").read_text())
+    names = [
+        re.split(r"[\s=<>!~@\[;]", req, maxsplit=1)[0]
+        for req in manifest["requirements"]
+    ]
+    assert "ttlock-ble" not in names
+    assert "ttlock_ble" not in names
 
-    manifest_pin = _pinned(manifest["requirements"], _SDK)
-    dev_pin = _pinned(pyproject["dependency-groups"]["dev"], _SDK)
 
-    assert manifest_pin is not None, f"{_SDK} is not pinned in manifest.json"
-    assert dev_pin is not None, f"{_SDK} is not pinned in the dev dependency group"
-    assert manifest_pin == dev_pin
+def test_sdk_is_bundled() -> None:
+    """scripts/bundle_ttlock_ble has been run and copied the package in."""
+    assert (_BUNDLED / "__init__.py").is_file()
+
+
+def test_integration_never_imports_an_installed_sdk() -> None:
+    """Every SDK import must be relative, so it resolves to the bundled copy.
+
+    An absolute `from ttlock_ble import …` would silently pick up any release
+    left installed in Home Assistant's environment instead.
+    """
+    absolute = re.compile(r"^\s*(from|import)\s+ttlock_ble\b", re.MULTILINE)
+    offenders = [
+        str(path.relative_to(_ROOT))
+        for path in _COMPONENT.rglob("*.py")
+        if _BUNDLED not in path.parents and absolute.search(path.read_text())
+    ]
+    assert offenders == []

@@ -15,8 +15,6 @@ from homeassistant.helpers.device_registry import (
     async_get as async_get_device_registry,
 )
 
-from ttlock_ble import VirtualKey
-
 from .advertisement import TtlockBleAdvertisementTracker
 from .clock_sync_store import async_get_clock_sync_store
 from .connection import TtlockBleConnection
@@ -26,6 +24,7 @@ from .data import TtlockBleData, TtlockBleLogCursor
 from .device_description_store import async_get_device_description_store
 from .record_store import async_get_record_store
 from .services import async_setup_services, async_unload_services
+from .ttlock_ble import VirtualKey
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant

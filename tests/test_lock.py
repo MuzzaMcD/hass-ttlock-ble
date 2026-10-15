@@ -4,7 +4,8 @@ from unittest.mock import AsyncMock
 
 import pytest
 from homeassistant.exceptions import HomeAssistantError
-from ttlock_ble import TTLockError
+
+from custom_components.hass_ttlock_ble.ttlock_ble import TTLockError
 
 
 async def test_lock_entity_created_for_each_key(hass, setup_integration) -> None:
@@ -214,9 +215,9 @@ async def test_settle_window_suppresses_blink(
     from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN
     from homeassistant.components.lock import SERVICE_UNLOCK
     from homeassistant.helpers.dispatcher import async_dispatcher_send
-    from ttlock_ble import LockEvent
 
     from custom_components.hass_ttlock_ble.connection import event_signal
+    from custom_components.hass_ttlock_ble.ttlock_ble import LockEvent
 
     # The mock returns "locked" — simulates the lock's BLE state lagging the
     # mechanical unlock. With settle active, this must NOT bounce the UI.
@@ -249,9 +250,9 @@ async def test_lock_event_triggers_state_refresh(
 ) -> None:
     """A push event on the dispatcher signal forces a state re-query."""
     from homeassistant.helpers.dispatcher import async_dispatcher_send
-    from ttlock_ble import LockEvent
 
     from custom_components.hass_ttlock_ble.connection import event_signal
+    from custom_components.hass_ttlock_ble.ttlock_ble import LockEvent
 
     state = hass.states.async_all("lock")[0]
     assert state.state == "locked"
@@ -275,9 +276,9 @@ async def test_lock_event_with_decoded_state_skips_query(
 ) -> None:
     """A push event carrying `lock_state` updates the UI without re-querying."""
     from homeassistant.helpers.dispatcher import async_dispatcher_send
-    from ttlock_ble import LockEvent
 
     from custom_components.hass_ttlock_ble.connection import event_signal
+    from custom_components.hass_ttlock_ble.ttlock_ble import LockEvent
 
     state = hass.states.async_all("lock")[0]
     assert state.state == "locked"
@@ -306,9 +307,9 @@ async def test_lock_event_with_decoded_state_respects_settle_window(
     from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN
     from homeassistant.components.lock import SERVICE_UNLOCK
     from homeassistant.helpers.dispatcher import async_dispatcher_send
-    from ttlock_ble import LockEvent
 
     from custom_components.hass_ttlock_ble.connection import event_signal
+    from custom_components.hass_ttlock_ble.ttlock_ble import LockEvent
 
     mock_ttlock_connection.async_query_state = AsyncMock(return_value=None)
     state = hass.states.async_all("lock")[0]
@@ -610,9 +611,9 @@ async def test_push_with_an_undecodable_state_byte_falls_back_to_a_query(
 ) -> None:
     """Build the event through the SDK, so the shape asserted is one it emits."""
     from homeassistant.helpers.dispatcher import async_dispatcher_send
-    from ttlock_ble import LockEvent
 
     from custom_components.hass_ttlock_ble.connection import event_signal
+    from custom_components.hass_ttlock_ble.ttlock_ble import LockEvent
 
     # A state byte outside the two the firmware defines decodes to None,
     # which is the only "unknown" the entity can ever be handed.
@@ -636,9 +637,9 @@ async def test_lock_event_forced_query_returns_none_keeps_state(
 ) -> None:
     """When the forced re-query yields no state, the UI keeps its last value."""
     from homeassistant.helpers.dispatcher import async_dispatcher_send
-    from ttlock_ble import LockEvent
 
     from custom_components.hass_ttlock_ble.connection import event_signal
+    from custom_components.hass_ttlock_ble.ttlock_ble import LockEvent
 
     state = hass.states.async_all("lock")[0]
     assert state.state == "locked"
@@ -660,8 +661,12 @@ def test_lock_sync_from_coordinator_no_snapshot_keeps_state(
     """An empty coordinator snapshot leaves `_attr_is_locked` untouched."""
     from unittest.mock import MagicMock
 
-    from custom_components.hass_ttlock_ble.clock_sync_store import TtlockBleClockSyncStore
-    from custom_components.hass_ttlock_ble.coordinator import TtlockBleDataUpdateCoordinator
+    from custom_components.hass_ttlock_ble.clock_sync_store import (
+        TtlockBleClockSyncStore,
+    )
+    from custom_components.hass_ttlock_ble.coordinator import (
+        TtlockBleDataUpdateCoordinator,
+    )
     from custom_components.hass_ttlock_ble.device_description_store import (
         TtlockBleDeviceDescriptionStore,
     )

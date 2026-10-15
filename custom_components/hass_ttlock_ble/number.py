@@ -10,20 +10,18 @@ from homeassistant.core import callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from ttlock_ble import TTLockError
-
 from .connection import auto_lock_signal
 from .entity import TtlockBleEntity
+from .ttlock_ble import TTLockError
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-    from ttlock_ble import VirtualKey
-
     from .connection import TtlockBleConnection
     from .coordinator import TtlockBleDataUpdateCoordinator
     from .data import TtlockBleConfigEntry
+    from .ttlock_ble import VirtualKey
 
 
 async def async_setup_entry(

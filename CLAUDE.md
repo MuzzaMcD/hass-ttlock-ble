@@ -35,14 +35,14 @@ The Home Assistant version is pinned in two places and **must be updated togethe
 
 Verify the pairing on PyPI before committing: the `requires_dist` of `pytest-homeassistant-custom-component` must list the same `homeassistant==<X.Y.Z>` you pinned in `pyproject.toml`. Run `uv sync` after bumping so `uv.lock` picks up the new pins.
 
-## The `ttlock-ble` SDK pin
+## The bundled `ttlock-ble` SDK
 
-This integration wraps the sibling repo [`ttlock-ble`](https://github.com/roquerodrigo/ttlock-ble), which owns all BLE protocol/crypto logic and the cloud login client. The pin lives in **two places that can drift**:
+This integration wraps the sibling repo [`ttlock-ble`](https://github.com/roquerodrigo/ttlock-ble), which owns all BLE protocol/crypto logic and the cloud login client. The SDK is **bundled** rather than installed from PyPI:
 
-- `custom_components/hass_ttlock_ble/manifest.json` → `requirements: ["ttlock-ble==<version>"]` — this is what HACS/HA actually installs for end users.
-- `pyproject.toml` → `dependency-groups.dev` → `"ttlock-ble==<version>"` — this is what lint/mypy/pytest run against locally and in CI.
-
-If these two pins diverge, CI is green against a different SDK version than what ships to users. A breaking change in the SDK's public API (`TTLockCloud`, `TTLockClient`, `VirtualKey`, `CloudError`, the `disconnected_callback` signature) requires bumping both pins together, then re-running lint + tests here — the SDK repo's own release does not by itself update anything on this side.
+- `scripts/bundle_ttlock_ble [path-to-ttlock-ble]` copies `src/ttlock_ble` into `custom_components/hass_ttlock_ble/ttlock_ble/` (minus `cli.py`) and records the source version/commit in `ttlock_ble/BUNDLED_VERSION`. Re-run it whenever the SDK changes.
+- The integration imports it with relative imports (`from .ttlock_ble import …`, `from ..ttlock_ble import …` in `data/`); tests import `custom_components.hass_ttlock_ble.ttlock_ble`. Never write `from ttlock_ble import …` — it would resolve to any copy left installed in Home Assistant's environment. `tests/test_packaging.py` enforces this.
+- `manifest.json` `requirements` does not list `ttlock-ble`. The SDK's own dependencies (`bleak`, `bleak-retry-connector`, `httpx`, `cryptography`) already ship with Home Assistant core and its `bluetooth` integration.
+- The bundled folder is excluded from ruff, mypy and coverage; it is linted and tested in its own repository.
 
 ## Architecture
 

@@ -12,7 +12,7 @@ from custom_components.hass_ttlock_ble.switch import (
     TtlockBleAutoLockSwitch,
     TtlockBlePassageModeSwitch,
 )
-from ttlock_ble import TTLockError
+from custom_components.hass_ttlock_ble.ttlock_ble import TTLockError
 
 
 @pytest.mark.asyncio

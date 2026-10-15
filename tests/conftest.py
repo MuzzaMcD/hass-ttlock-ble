@@ -4,8 +4,6 @@ from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from ttlock_ble import DeviceInfo, VirtualKey
-from ttlock_ble.models.lock_version import LockVersion
 
 # Eagerly import the integration submodules so `unittest.mock.patch` can
 # resolve dotted targets like `custom_components.hass_ttlock_ble.api.TTLockCloud`
@@ -18,6 +16,8 @@ import custom_components.hass_ttlock_ble.api
 import custom_components.hass_ttlock_ble.connection
 import custom_components.hass_ttlock_ble.coordinator
 import custom_components.hass_ttlock_ble.lock  # noqa: F401
+from custom_components.hass_ttlock_ble.ttlock_ble import DeviceInfo, VirtualKey
+from custom_components.hass_ttlock_ble.ttlock_ble.models.lock_version import LockVersion
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -210,7 +210,10 @@ async def setup_integration(
 
 def lock_advertisement(*, locked: bool, battery: int, dormant: bool = False):
     """Build a decoded advertisement the way the SDK hands one over."""
-    from ttlock_ble import LockAdvertisement, LockState
+    from custom_components.hass_ttlock_ble.ttlock_ble import (
+        LockAdvertisement,
+        LockState,
+    )
 
     return LockAdvertisement(
         protocol_type=5,

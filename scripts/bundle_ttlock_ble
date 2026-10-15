@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Copy the ttlock_ble library source into the integration so it ships with it.
+#
+# Home Assistant then imports the bundled copy directly; nothing is installed
+# from PyPI. Re-run this whenever the library changes, then sync to HA.
+#
+# Usage: scripts/bundle_ttlock_ble [path-to-ttlock-ble-project]
+#        (defaults to ../ttlock-ble, next to this repository)
+
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "$0")/.." && pwd)"
+library_project="${1:-$repo_root/../ttlock-ble}"
+src="$library_project/src/ttlock_ble/"
+dest="$repo_root/custom_components/hass_ttlock_ble/ttlock_ble/"
+
+if [[ ! -f "$src/__init__.py" ]]; then
+  echo "ttlock_ble source not found at: $src" >&2
+  echo "Pass the ttlock-ble project folder as the first argument." >&2
+  exit 1
+fi
+
+mkdir -p "$dest"
+# cli.py is the command-line tool (needs typer); the integration never uses it.
+rsync -rt --delete --checksum \
+  --exclude '__pycache__' --exclude '.DS_Store' --exclude 'cli.py' \
+  "$src" "$dest"
+
+version="$(sed -n 's/^version = "\(.*\)"/\1/p' "$library_project/pyproject.toml" | head -1)"
+commit="$(git -C "$library_project" rev-parse --short HEAD 2>/dev/null || echo unknown)"
+dirty="$(git -C "$library_project" status --porcelain 2>/dev/null | grep -q . && echo ' +uncommitted changes' || true)"
+printf 'ttlock-ble %s (commit %s%s)\n' "$version" "$commit" "$dirty" > "${dest}BUNDLED_VERSION"
+
+echo "Bundled $(cat "${dest}BUNDLED_VERSION")"
+echo "  from: $src"
+echo "  into: $dest"

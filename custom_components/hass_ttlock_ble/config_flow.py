@@ -31,8 +31,6 @@ if TYPE_CHECKING:
 
     from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
 
-    from ttlock_ble import LockAdvertisement
-
     from .data import (
         TtlockBleConfigData,
         TtlockBleConfigEntry,
@@ -41,6 +39,7 @@ if TYPE_CHECKING:
         TtlockBleStoredKey,
         TtlockBleVerificationInput,
     )
+    from .ttlock_ble import LockAdvertisement
 
 
 CONF_VERIFICATION_CODE = "verification_code"

@@ -23,8 +23,6 @@ from homeassistant.components.bluetooth import async_ble_device_from_address
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.util import dt as dt_util
 
-from ttlock_ble import TTLockClient, TTLockError
-
 from .const import DOMAIN, LOGGER
 from .credentials import (
     async_client_get_fingerprints,
@@ -38,6 +36,7 @@ from .passage import (
     async_client_get_passage_mode,
     async_client_set_passage_mode,
 )
+from .ttlock_ble import TTLockClient, TTLockError
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -45,9 +44,8 @@ if TYPE_CHECKING:
     from bleak import BleakClient
     from homeassistant.core import HomeAssistant
 
-    from ttlock_ble import DeviceInfo, LockEvent, LockState, LogEntry, VirtualKey
-
     from .data import TtlockBlePassageSchedule
+    from .ttlock_ble import DeviceInfo, LockEvent, LockState, LogEntry, VirtualKey
 
 
 RECONNECT_INITIAL_BACKOFF = 1.0
@@ -689,6 +687,7 @@ class TtlockBleConnection:
                 len(new_entries),
             )
             for entry in new_entries:
+                LOGGER.warning("ttlock_ble log entry: %s", entry)  # TEMP: remove after debugging
                 async_dispatcher_send(
                     self._hass,
                     log_signal(self._key.lockMac),

@@ -4,10 +4,10 @@ import datetime as dt
 
 import pytest
 from homeassistant.helpers.dispatcher import async_dispatcher_send
-from ttlock_ble import LogEntry, LogOperate
 
 from custom_components.hass_ttlock_ble.connection import log_signal
 from custom_components.hass_ttlock_ble.event import _classify_record, _record_type_name
+from custom_components.hass_ttlock_ble.ttlock_ble import LogEntry, LogOperate
 
 
 def _log_state(hass):
@@ -160,8 +160,6 @@ def test_every_record_type_is_deliberately_classified() -> None:
     enum, so a type added to the SDK later fails here until someone has
     decided what it means rather than silently becoming `other`.
     """
-    from ttlock_ble import LogOperate
-
     from custom_components.hass_ttlock_ble.event import (
         LOCK_RECORD_TYPES,
         PASSWORD_CHANGE_RECORD_TYPES,
@@ -169,6 +167,7 @@ def test_every_record_type_is_deliberately_classified() -> None:
         UNLOCK_FAILED_RECORD_TYPES,
         UNLOCK_RECORD_TYPES,
     )
+    from custom_components.hass_ttlock_ble.ttlock_ble import LogOperate
 
     accounted = (
         UNLOCK_RECORD_TYPES
@@ -204,12 +203,11 @@ def test_the_buckets_do_not_overlap() -> None:
 
 def test_a_passcode_carrying_record_never_leaks_its_code() -> None:
     """Newly classified types must not have widened what reaches an attribute."""
-    from ttlock_ble import LogOperate
-
     from custom_components.hass_ttlock_ble.event import (
         PASSCODE_RECORD_TYPES,
         UNLOCK_RECORD_TYPES,
     )
+    from custom_components.hass_ttlock_ble.ttlock_ble import LogOperate
 
     assert LogOperate.ADMIN_CODE_UNLOCK in PASSCODE_RECORD_TYPES
     assert LogOperate.DOUBLE_CHECK_PASSCODE_UNLOCK in PASSCODE_RECORD_TYPES

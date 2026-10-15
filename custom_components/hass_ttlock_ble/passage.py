@@ -4,16 +4,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ttlock_ble import TTLockError
-from ttlock_ble.constants import ResponseStatus
-from ttlock_ble.protocol import Frame
-
 from .const import LOGGER
+from .ttlock_ble import TTLockError
+from .ttlock_ble.constants import ResponseStatus
+from .ttlock_ble.protocol import Frame
 
 if TYPE_CHECKING:
-    from ttlock_ble import TTLockClient
-
     from .data import TtlockBlePassageSchedule
+    from .ttlock_ble import TTLockClient
 
 CMD_CONFIGURE_PASSAGE_MODE = 0x66
 

@@ -7,17 +7,15 @@ from typing import TYPE_CHECKING
 
 from homeassistant.components.bluetooth import async_last_service_info
 
-from ttlock_ble import LockVersion, VirtualKey
-
 from .advertisement import decode_lock_advertisement
 from .const import LOGGER
+from .ttlock_ble import LockVersion, VirtualKey
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
 
-    from ttlock_ble import LockAdvertisement
-
     from .data import TtlockBleManualKeyInput, TtlockBleStoredKey
+    from .ttlock_ble import LockAdvertisement
 
 _MAC_PATTERN = re.compile(r"^([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}$")
 _AES_KEY_BYTES = 16

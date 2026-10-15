@@ -13,9 +13,8 @@ from homeassistant.components.bluetooth import (
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import format_mac
 
-from ttlock_ble import LockAdvertisement
-
 from .const import LOGGER
+from .ttlock_ble import LockAdvertisement
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -26,9 +25,8 @@ if TYPE_CHECKING:
     )
     from homeassistant.core import CALLBACK_TYPE, HomeAssistant
 
-    from ttlock_ble import VirtualKey
-
     from .coordinator import TtlockBleDataUpdateCoordinator
+    from .ttlock_ble import VirtualKey
 
 
 class TtlockBleAdvertisementTracker:

@@ -23,7 +23,6 @@ dev = [
     "pytest-cov==7.1.0",
     "pytest-homeassistant-custom-component==0.13.354",
     "serialx==1.9.0",
-    "ttlock-ble==0.3.1",
 ]
 lint = [
     "ruff==0.16.5",
@@ -36,13 +35,19 @@ testpaths = ["tests"]
 pythonpath = ["."]
 addopts = [
     "--cov=custom_components/hass_ttlock_ble",
+    "--cov-config=pyproject.toml",
     "--cov-report=term-missing",
     "--cov-fail-under=90",
 ]
 
+[tool.coverage.run]
+# The bundled SDK is tested in its own repository.
+omit = ["custom_components/hass_ttlock_ble/ttlock_ble/*"]
+
 [tool.mypy]
 python_version = "3.14"
 files = ["custom_components/hass_ttlock_ble"]
+exclude = ["^custom_components/hass_ttlock_ble/ttlock_ble/"]
 explicit_package_bases = true
 ignore_missing_imports = true
 follow_imports = "silent"
@@ -56,12 +61,20 @@ disallow_untyped_defs = true
 disallow_any_generics = true
 
 [[tool.mypy.overrides]]
+# The bundled SDK is type-checked in its own repository.
+module = "custom_components.hass_ttlock_ble.ttlock_ble.*"
+follow_imports = "skip"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
 module = "tests.*"
 disallow_untyped_defs = false
 check_untyped_defs = false
 
 [tool.ruff]
 target-version = "py314"
+# The bundled SDK follows its own repository's lint rules.
+extend-exclude = ["custom_components/hass_ttlock_ble/ttlock_ble"]
 
 [tool.ruff.format]
 exclude = ["*.md"]  # ruff 0.16 formats Python blocks in Markdown; docs keep their own layout

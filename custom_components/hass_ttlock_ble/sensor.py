@@ -30,8 +30,6 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.util import dt as dt_util
 
-from ttlock_ble.constants import LogOperate
-
 from .binary_sensor import (
     format_schedules_attribute,
     get_next_passage_mode_transition,
@@ -44,6 +42,7 @@ from .connection import (
 )
 from .entity import TtlockBleEntity
 from .event import PASSCODE_RECORD_TYPES, _record_type_name
+from .ttlock_ble.constants import LogOperate
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -51,11 +50,10 @@ if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-    from ttlock_ble import LockEvent, LogEntry, VirtualKey
-
     from .connection import TtlockBleConnection
     from .coordinator import TtlockBleDataUpdateCoordinator
     from .data import TtlockBleConfigEntry
+    from .ttlock_ble import LockEvent, LogEntry, VirtualKey
 
 # How often the recorded advertisement time is re-read. Costs nothing on
 # the wire: it only looks at what the bluetooth manager already holds.
@@ -274,6 +272,11 @@ class TtlockBleLastSeenSensor(TtlockBleEntity, SensorEntity):
             self._attr_native_value = dt_util.utcnow() - timedelta(seconds=age)
         return self._attr_native_value
 
+# Record types seen on real locks but missing from ttlock_ble.LogOperate
+EXTRA_RECORD_TYPES: dict[int, str] = {
+    45: "Locked \u2705 Auto",
+    47: "Locked \u2705 #Key",  # hold-# lock, observed
+}
 
 def format_unlock_method(entry: LogEntry) -> str:
     """Format a LogEntry into a human-friendly unlock method string."""
@@ -290,14 +293,14 @@ def format_unlock_method(entry: LogEntry) -> str:
         LogOperate.IC_UNLOCK_SUCCEED,
         LogOperate.DOUBLE_CHECK_CARD_UNLOCK,
     ):
-        return f"RFID Card ({cred})" if cred else "RFID Card"
+        return f"Unlock \u2705 Card ({cred})" if cred else "Unlock \u2705 Card"
 
     if rtype in (
         LogOperate.KEYBOARD_PASSWORD_UNLOCK,
         LogOperate.DOUBLE_CHECK_PASSCODE_UNLOCK,
         LogOperate.ADMIN_CODE_UNLOCK,
     ):
-        return "Passcode"
+        return "Unlock \u2705 Pin"
 
     if rtype in (
         LogOperate.MOBILE_UNLOCK,
@@ -306,7 +309,7 @@ def format_unlock_method(entry: LogEntry) -> str:
         LogOperate.APP_AUTH_KEY_UNLOCK_SUCCESS,
         LogOperate.GATEWAY_AUTH_KEY_UNLOCK_SUCCESS,
     ):
-        return f"Mobile App (Key ID: {entry.key_id})" if entry.key_id else "Mobile App"
+        return f"Mobile App (Key ID: {entry.key_id})" if entry.key_id else "Unlock \u2705 BLE"
 
     if rtype in (
         LogOperate.WIRELESS_KEY_FOB,
@@ -321,8 +324,14 @@ def format_unlock_method(entry: LogEntry) -> str:
     ):
         return f"Face ({cred})" if cred else "Face"
 
-    if rtype == LogOperate.AUTO_LOCK:
-        return "Auto-Lock"
+    if rtype == LogOperate.OPERATE_BLE_LOCK:
+        return "Locked \u2705 BLE"
+
+    if rtype == LogOperate.ERROR_PASSWORD_UNLOCK:
+        return "Unlock \u274C Bad Pin"
+ 
+    if rtype in EXTRA_RECORD_TYPES:
+        return EXTRA_RECORD_TYPES[rtype]
 
     if rtype == LogOperate.OPERATE_KEY_UNLOCK:
         return "Mechanical Key"
@@ -343,8 +352,8 @@ def format_unlock_method(entry: LogEntry) -> str:
 class TtlockBleLastUnlockMethodSensor(TtlockBleEntity, RestoreEntity, SensorEntity):
     """Sensor reporting how the lock was last opened or operated."""
 
-    _attr_translation_key = "last_unlock_method"
-    _attr_icon = "mdi:account-lock-open-outline"
+    _attr_translation_key = "activity_log"
+    _attr_icon = "mdi:lock-clock"
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def __init__(

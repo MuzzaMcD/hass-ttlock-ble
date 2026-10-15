@@ -15,9 +15,8 @@ from .const import ATTRIBUTION, DOMAIN, MANUFACTURER
 from .coordinator import TtlockBleDataUpdateCoordinator
 
 if TYPE_CHECKING:
-    from ttlock_ble import VirtualKey
-
     from .data import TtlockBleLockState
+    from .ttlock_ble import VirtualKey
 
 
 class TtlockBleEntity(CoordinatorEntity[TtlockBleDataUpdateCoordinator]):

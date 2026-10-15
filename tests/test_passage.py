@@ -5,9 +5,6 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from ttlock_ble import TTLockError
-from ttlock_ble.constants import ResponseStatus
-from ttlock_ble.protocol import Frame
 
 from custom_components.hass_ttlock_ble.data import TtlockBlePassageSchedule
 from custom_components.hass_ttlock_ble.passage import (
@@ -34,6 +31,9 @@ from custom_components.hass_ttlock_ble.services import (
     _parse_single_slot,
     _parse_time_component,
 )
+from custom_components.hass_ttlock_ble.ttlock_ble import TTLockError
+from custom_components.hass_ttlock_ble.ttlock_ble.constants import ResponseStatus
+from custom_components.hass_ttlock_ble.ttlock_ble.protocol import Frame
 
 
 def test_build_passage_query_payload() -> None:

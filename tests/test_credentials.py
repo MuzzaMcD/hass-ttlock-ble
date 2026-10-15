@@ -20,7 +20,7 @@ from custom_components.hass_ttlock_ble.credentials import (
     parse_ic_cards_query_response,
     parse_passcodes_query_response,
 )
-from ttlock_ble.constants import ResponseStatus
+from custom_components.hass_ttlock_ble.ttlock_ble.constants import ResponseStatus
 
 
 def test_build_payloads() -> None:

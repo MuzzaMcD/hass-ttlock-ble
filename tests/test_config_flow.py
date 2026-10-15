@@ -21,7 +21,7 @@ from custom_components.hass_ttlock_ble.exceptions import (
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-    from ttlock_ble import VirtualKey
+    from custom_components.hass_ttlock_ble.ttlock_ble import VirtualKey
 
 
 USER_INPUT = {"username": "user@example.com", "password": "pass"}

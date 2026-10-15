@@ -14,18 +14,16 @@ from homeassistant.components.event import EventEntity
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from ttlock_ble import LogOperate
-
 from .connection import log_signal
 from .entity import TtlockBleEntity
+from .ttlock_ble import LogOperate
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-    from ttlock_ble import LogEntry
-
     from .data import TtlockBleConfigEntry, TtlockBleLogEventAttributes
+    from .ttlock_ble import LogEntry
 
 
 LOG_EVENT_TYPES: list[str] = [
@@ -119,6 +117,8 @@ LOCK_RECORD_TYPES: frozenset[int] = frozenset(
         LogOperate.THIRD_DEVICE_LOCK_SUCCESS,
     },
 )
+# Record types seen on real locks but missing from ttlock_ble.LogOperate (reported upstream)
+LOCK_RECORD_TYPES = frozenset({*LOCK_RECORD_TYPES, 45, 47})
 
 UNLOCK_FAILED_RECORD_TYPES: frozenset[int] = frozenset(
     {

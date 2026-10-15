@@ -43,7 +43,9 @@ async def test_clock_drift_reports_the_last_comparison(
     setup_integration,
     sample_virtual_key,
 ) -> None:
-    from custom_components.hass_ttlock_ble.clock_sync_store import async_get_clock_sync_store
+    from custom_components.hass_ttlock_ble.clock_sync_store import (
+        async_get_clock_sync_store,
+    )
 
     store = await async_get_clock_sync_store(hass)
     store.async_remember(
@@ -130,9 +132,9 @@ async def test_battery_sensor_updates_from_push_event(
 ) -> None:
     """A push event carrying `battery` updates the sensor without polling."""
     from homeassistant.helpers.dispatcher import async_dispatcher_send
-    from ttlock_ble import LockEvent
 
     from custom_components.hass_ttlock_ble.connection import event_signal
+    from custom_components.hass_ttlock_ble.ttlock_ble import LockEvent
 
     state = _battery_state(hass)
     assert state.state == "80"
@@ -153,9 +155,9 @@ async def test_battery_sensor_ignores_push_event_without_battery(
 ) -> None:
     """An event with no decoded battery byte must not clobber the last value."""
     from homeassistant.helpers.dispatcher import async_dispatcher_send
-    from ttlock_ble import LockEvent
 
     from custom_components.hass_ttlock_ble.connection import event_signal
+    from custom_components.hass_ttlock_ble.ttlock_ble import LockEvent
 
     state = _battery_state(hass)
     assert state.state == "80"
@@ -187,8 +189,12 @@ def test_battery_sync_from_coordinator_no_snapshot_keeps_value(
 ) -> None:
     """An empty coordinator snapshot leaves `_attr_native_value` untouched."""
 
-    from custom_components.hass_ttlock_ble.clock_sync_store import TtlockBleClockSyncStore
-    from custom_components.hass_ttlock_ble.coordinator import TtlockBleDataUpdateCoordinator
+    from custom_components.hass_ttlock_ble.clock_sync_store import (
+        TtlockBleClockSyncStore,
+    )
+    from custom_components.hass_ttlock_ble.coordinator import (
+        TtlockBleDataUpdateCoordinator,
+    )
     from custom_components.hass_ttlock_ble.device_description_store import (
         TtlockBleDeviceDescriptionStore,
     )

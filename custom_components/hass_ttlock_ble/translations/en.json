@@ -185,8 +185,8 @@
       "last_seen": {
         "name": "Last seen"
       },
-      "last_unlock_method": {
-        "name": "Last unlock method"
+      "activity_log": {
+        "name": "Journal"
       },
       "passcodes_count": {
         "name": "Passcodes count"

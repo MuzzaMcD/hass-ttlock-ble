@@ -6,14 +6,14 @@ import datetime as dt
 from unittest.mock import MagicMock
 
 import pytest
-from ttlock_ble import LogEntry
-from ttlock_ble.constants import LogOperate
 
 from custom_components.hass_ttlock_ble.sensor import (
     TtlockBleCredentialsCountSensor,
     TtlockBleLastUnlockMethodSensor,
     format_unlock_method,
 )
+from custom_components.hass_ttlock_ble.ttlock_ble import LogEntry
+from custom_components.hass_ttlock_ble.ttlock_ble.constants import LogOperate
 
 
 def test_format_unlock_method() -> None:

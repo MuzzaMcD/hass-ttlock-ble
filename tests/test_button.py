@@ -13,7 +13,7 @@ from custom_components.hass_ttlock_ble.button import (
     TtlockBleSyncLogButton,
     async_setup_entry,
 )
-from ttlock_ble import TTLockError
+from custom_components.hass_ttlock_ble.ttlock_ble import TTLockError
 
 
 @pytest.mark.asyncio

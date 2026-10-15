@@ -8,7 +8,7 @@ from homeassistant.components.bluetooth import async_last_service_info
 from homeassistant.components.diagnostics import REDACTED, async_redact_data
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 
-from ttlock_ble import LockAdvertisement
+from .ttlock_ble import LockAdvertisement
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
